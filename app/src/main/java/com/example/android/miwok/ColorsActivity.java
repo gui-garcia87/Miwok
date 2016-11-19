@@ -28,6 +28,13 @@ public class ColorsActivity extends AppCompatActivity {
 
     private MediaPlayer mediaPlayer;
 
+    private MediaPlayer.OnCompletionListener mCompletionListener = new MediaPlayer.OnCompletionListener() {
+        @Override
+        public void onCompletion(MediaPlayer mp) {
+            releaseMediaPlayer();
+        }
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,13 +68,9 @@ public class ColorsActivity extends AppCompatActivity {
                 mediaPlayer = MediaPlayer.create(ColorsActivity.this, word.getmAudioResourceId());
 
                 mediaPlayer.start();
-
-                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mp) {
-                        releaseMediaPlayer();
-                    }
-                });
+                //Setup a listener on the media player, so that we can stop and release the media
+                //player o onde sound finish
+                mediaPlayer.setOnCompletionListener(mCompletionListener);
             }
         });
 
