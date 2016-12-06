@@ -33,7 +33,7 @@ public class ColorsActivity extends AppCompatActivity {
         public void onCompletion(MediaPlayer mp) {
             releaseMediaPlayer();
         }
-    }
+    };
 
 
     @Override
@@ -65,15 +65,26 @@ public class ColorsActivity extends AppCompatActivity {
 
                 Word word = colors.get(position);
 
+                //Release the mediaplayer if it currently on use
+                releaseMediaPlayer();
+
                 mediaPlayer = MediaPlayer.create(ColorsActivity.this, word.getmAudioResourceId());
 
                 mediaPlayer.start();
                 //Setup a listener on the media player, so that we can stop and release the media
-                //player o onde sound finish
+                //player o when sound finish
                 mediaPlayer.setOnCompletionListener(mCompletionListener);
             }
         });
 
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // So when activity stopped, release the media player resources becuse whe won't
+        // be playing any more sounds
+        releaseMediaPlayer();
     }
 
     /**
