@@ -1,32 +1,24 @@
-/*
- * Copyright (C) 2016 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.example.android.miwok;
+
 
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
 
-public class FamilyActivity extends AppCompatActivity {
+/**
+ * A simple {@link Fragment} subclass.
+ */
+public class ColorsFragment extends Fragment {
+
 
     private MediaPlayer mediaPlayer;
 
@@ -70,30 +62,35 @@ public class FamilyActivity extends AppCompatActivity {
     };
 
 
+    public ColorsFragment() {
+        // Required empty public constructor
+    }
+
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.word_list);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        View rootView = inflater.inflate(R.layout.word_list, container, false);
 
         // Create and setup the {@link AudioManager} to request audio focus
-        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        mAudioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
 
-        final ArrayList<Word> family = new ArrayList<Word>();
 
-        family.add(new Word("father","әpә", R.drawable.family_father, R.raw.family_father));
-        family.add(new Word("mother","әṭa", R.drawable.family_mother, R.raw.family_mother));
-        family.add(new Word("son","angsi", R.drawable.family_son, R.raw.family_son));
-        family.add(new Word("daughter","tune", R.drawable.family_daughter, R.raw.family_daughter));
-        family.add(new Word("older brother","taachi", R.drawable.family_older_brother, R.raw.family_older_brother));
-        family.add(new Word("younger brother","chalitti", R.drawable.family_younger_brother, R.raw.family_younger_brother));
-        family.add(new Word("older sister","teṭe", R.drawable.family_older_sister, R.raw.family_older_sister));
-        family.add(new Word("younger sister","kolliti", R.drawable.family_younger_sister, R.raw.family_younger_sister));
-        family.add(new Word("grandmother","ama", R.drawable.family_grandmother, R.raw.family_grandmother));
-        family.add(new Word("grandfather","paapa", R.drawable.family_grandfather, R.raw.family_grandfather));
+        final ArrayList<Word> colors = new ArrayList<Word>();
 
-        WordAdapter adapter = new WordAdapter(this, family, R.color.category_family);
+        colors.add(new Word("red","wetetti", R.drawable.color_red, R.raw.color_red));
+        colors.add(new Word("green","chokokki", R.drawable.color_green, R.raw.color_green));
+        colors.add(new Word("brown","ṭakaakki", R.drawable.color_brown, R.raw.color_brown));
+        colors.add(new Word("gray","ṭopoppi", R.drawable.color_gray, R.raw.color_gray));
+        colors.add(new Word("black","kululli", R.drawable.color_black, R.raw.color_black));
+        colors.add(new Word("white","kelelli", R.drawable.color_white, R.raw.color_white));
+        colors.add(new Word("dusty yellow","ṭopiisә", R.drawable.color_dusty_yellow, R.raw.color_dusty_yellow));
+        colors.add(new Word("mustard yellow","chiwiiṭә", R.drawable.color_mustard_yellow, R.raw.color_mustard_yellow));
 
-        ListView listView = (ListView) findViewById(R.id.list);
+        WordAdapter adapter = new WordAdapter(getActivity(),colors, R.color.category_colors);
+
+        ListView listView =  (ListView) rootView.findViewById(R.id.list);
 
         listView.setAdapter(adapter);
 
@@ -101,7 +98,7 @@ public class FamilyActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                Word word = family.get(position);
+                Word word = colors.get(position);
 
                 //Release the mediaplayer if it currently on use
                 releaseMediaPlayer();
@@ -115,27 +112,25 @@ public class FamilyActivity extends AppCompatActivity {
                 if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                     // We have audio focus now.
 
-                    mediaPlayer = MediaPlayer.create(FamilyActivity.this, word.getmAudioResourceId());
+                    mediaPlayer = MediaPlayer.create(getActivity(), word.getmAudioResourceId());
 
                     mediaPlayer.start();
-
                     //Setup a listener on the media player, so that we can stop and release the media
                     //player o when sound finish
                     mediaPlayer.setOnCompletionListener(mCompletionListener);
                 }
+
+
             }
+
         });
-
-
-
+        return rootView;
     }
 
-
     @Override
-    protected void onStop() {
+    public void onStop() {
         super.onStop();
-        // So when activity stopped, release the media player resources becuse whe won't
-        // be playing any more sounds
+
         releaseMediaPlayer();
     }
 
@@ -153,8 +148,11 @@ public class FamilyActivity extends AppCompatActivity {
             // setting the media player to null is an easy way to tell that the media player
             // is not configured to play an audio file at the moment.
             mediaPlayer = null;
+
+            // Regardless of whether or not we were granted audio focus, abandon it. This also
+            // unregisters the AudioFocusChangeListener so we don't get anymore callbacks.
+            mAudioManager.abandonAudioFocus(mOnAudioFocusChangeListener);
         }
     }
+
 }
-
-
